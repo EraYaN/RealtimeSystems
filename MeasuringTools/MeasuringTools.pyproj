@@ -6,7 +6,7 @@
     <ProjectGuid>0c065226-a3e1-4cd8-8d47-3af3becec8a7</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>interrupt_handler_duration.py</StartupFile>
+    <StartupFile>ParsingUtils.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -23,7 +23,12 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="interrupt_handler_duration.py" />
+    <Compile Include="ParsingUtils.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="TraceFile.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

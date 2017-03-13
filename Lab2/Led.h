@@ -7,7 +7,6 @@
  * JL, 22-12-2010
  */
 
-#include <stdint.h>
 #include <io.h>
 #include <iomacros.h>
 

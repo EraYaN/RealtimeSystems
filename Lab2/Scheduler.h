@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include "ErrorCodes.h"
 
-#define NUMTASKS    10  /* # tasks admitted                                 */
+#define NUMTASKS    5  /* # tasks admitted                                 */
 
 #define DIRECT      1   /* task flag: execute uninterruptable, when ready   */
 #define PERIODIC    2   /* general flag: trigger by timer interrupt         */
@@ -45,7 +45,7 @@ uint16_t IntDisable (void);
 void     RestoreSW (uint16_t sw);
 
 void    InitTasks (void);
-uint8_t RegisterTask (uint16_t Phasing, uint16_t Period, 
+uint8_t RegisterTask (uint16_t Phasing, uint16_t Period,
                       void (*TaskFunc) (void), uint8_t Prio, uint8_t Flags);
 uint8_t UnRegisterTask (uint8_t Prio);
 

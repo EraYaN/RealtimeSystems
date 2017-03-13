@@ -41,17 +41,19 @@ Task Tasks[NUMTASKS];           /* Lower indices: lower priorities           */
  * Get and set status word (sreg, or r2).
  */
 
-uint16_t IntDisable(void) {
-	uint16_t sw;
-	  // sw = r2
-	asm volatile("mov.w r2, %0\n\t" : "=r"(sw));
-	_DINT();
-	return (sw);
+uint16_t IntDisable (void)
+{
+  uint16_t sw;
+    // sw = r2
+  asm volatile ("mov.w r2, %0\n\t" : "=r"(sw));
+  _DINT();
+  return (sw);
 }
 
-void RestoreSW(uint16_t sw) {
+void RestoreSW (uint16_t sw)
+{
     // r2 = sw
-	asm volatile("mov.w %0, r2\n\t"::"r"(sw));
+  asm volatile ("mov.w %0, r2\n\t" :: "r"(sw));
 }  
 
 /* 
@@ -60,12 +62,13 @@ void RestoreSW(uint16_t sw) {
  * The clock must be started elsewhere.
  */
 
-void InitTasks(void) {			
-	uint8_t i = NUMTASKS - 1; 
-	do { 
-		Taskp t = &Tasks[i]; 
-		t->Flags = t->Activated = t->Invoked = 0;
-	} while (i--);
+void InitTasks (void)
+{			
+  uint8_t i=NUMTASKS-1; 
+  do { 
+    Taskp t = &Tasks[i]; 
+    t->Flags = t->Activated = t->Invoked = 0;
+  } while (i--);
 }
 
 /*
@@ -74,44 +77,45 @@ void InitTasks(void) {
  * Each priority level has at most one task.
  */
 
-uint8_t RegisterTask(uint16_t Phasing,
-	uint16_t Period, 
-	void(*TaskFunc)(void),
-	uint8_t Prio,
-	uint8_t Flags) {
-	uint8_t  rtc = E_SUCCESS;
-	uint16_t sw;
+uint8_t RegisterTask (uint16_t Phasing, uint16_t Period, 
+                      void (*TaskFunc) (void), uint8_t Prio, uint8_t Flags)
+{
+  uint8_t  rtc = E_SUCCESS;
+  uint16_t sw;
 
-	if (Prio >= NUMTASKS) return (E_BOUNDS); // out of bounds
-	if (Period == 0) return (E_WRONGPAR);
-	sw = IntDisable(); 
-	Taskp t = &Tasks[Prio]; 
-	if (t->Flags) rtc = E_BUSY; else {
-		t->Remaining = Phasing;
-		t->Period    = Period; 
-		t->Activated = t->Invoked = 0; 
-		t->Taskf     = TaskFunc; 
-		t->Flags     = Flags | TRIGGERED;
-	}
-	RestoreSW(sw);
-	return (rtc);
+  if (Prio>=NUMTASKS) return (E_BOUNDS); // out of bounds
+  if (Period == 0) return (E_WRONGPAR);
+  sw = IntDisable (); 
+  Taskp t = &Tasks[Prio]; 
+  if (t->Flags) rtc = E_BUSY; 
+  else {
+    t->Remaining = Phasing;
+    t->Period    = Period; 
+    t->Activated = t->Invoked = 0; 
+    t->Taskf     = TaskFunc; 
+    t->Flags     = Flags | TRIGGERED;
+  }
+  RestoreSW (sw);
+  return (rtc);
 }
 
-uint8_t UnRegisterTask(uint8_t t) {
-	Tasks[t].Flags = 0;
-	return (E_SUCCESS);
+uint8_t UnRegisterTask (uint8_t t)
+{
+  Tasks[t].Flags = 0;
+  return (E_SUCCESS);
 }  
 
-interrupt(TIMERA0_VECTOR) TimerIntrpt(void) {
-	uint8_t i = NUMTASKS - 1; 
-	do {
-		Taskp t = &Tasks[i];
-		if (t->Flags & TRIGGERED) // countdown
-			if (t->Remaining-- == 0) {
-				t->Remaining = t->Period - 1; 
-				t->Activated++; t->Taskf(); t->Invoked++;
-			}
-	} while (i--);
+interrupt (TIMERA0_VECTOR) TimerIntrpt (void)
+{
+  uint8_t i = NUMTASKS-1; 
+  do {
+    Taskp t = &Tasks[i];
+    if (t->Flags & TRIGGERED) // countdown
+      if (t->Remaining-- == 0) {
+        t->Remaining = t->Period-1; 
+	t->Activated++; t->Taskf(); t->Invoked++;
+      }
+  } while (i--);
 }
 
 #endif
