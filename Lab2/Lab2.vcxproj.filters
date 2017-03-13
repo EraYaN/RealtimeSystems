@@ -37,6 +37,9 @@
     <ClCompile Include="SchedulerNPBasic.c">
       <Filter>Source files</Filter>
     </ClCompile>
+    <ClCompile Include="SchedulerNP.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Clock.h">

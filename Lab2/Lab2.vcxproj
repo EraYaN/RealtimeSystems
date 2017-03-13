@@ -39,6 +39,7 @@
     <ClCompile Include="Clock.c" />
     <ClCompile Include="Led.c" />
     <ClCompile Include="SchedTest.c" />
+    <ClCompile Include="SchedulerNP.c" />
     <ClCompile Include="SchedulerNPBasic.c" />
   </ItemGroup>
   <ItemGroup>

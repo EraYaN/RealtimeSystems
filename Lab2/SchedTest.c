@@ -12,8 +12,8 @@
  * If an UART has been added:    #define UART
  */
 
-#define NONPREBASIC
- //#define NONPRE
+//#define NONPREBASIC
+#define NONPRE
  //#define THREADS
  //#define SEMA
 
@@ -31,9 +31,9 @@
 #define BLINKERB  1
 #define BLINKERC  0
 
-#define YELLOWBLINKPRIO 4
-#define REDBLINKPRIO    3
-#define GREENBLINKPRIO  2
+#define YELLOWBLINKPRIO 5
+#define REDBLINKPRIO    4
+#define GREENBLINKPRIO  3
 
 #define UARTCHAR 6
 
@@ -50,14 +50,14 @@ void CountDelay(volatile uint16_t cnt) {
 }
 
 void BlinkGreen(void) {
-	/*static int i = 0;
+	static int i = 0;
 	if (++i % 4 == 0) {
 		CountDelay(60000);
 
-		/* An event-triggered extension
-		Activate (REDBLINKPRIO, TicksPS/2);
+		/*An event-triggered extension
+		Activate (REDBLINKPRIO, TicksPS/2);*/
 
-	}*/
+	}
 	ToggleLeds(GREEN);
 }
 
@@ -106,9 +106,9 @@ int main(void) {
 #define Tst1
 
 #ifdef Tst1
-	//RegisterTask(0, 1024, BlinkYellow, YELLOWBLINKPRIO, 0);
+	RegisterTask(0, 1024, BlinkYellow, YELLOWBLINKPRIO, 0);
 	RegisterTask(0, 512, BlinkGreen, GREENBLINKPRIO, 0);
-	//RegisterTask(0, 0, BlinkRed, REDBLINKPRIO, 0);
+	RegisterTask(0, 0, BlinkRed, REDBLINKPRIO, 0);
 #endif
 #ifdef Tst2
 	RegisterTask(0, TicksPS, SendChar, UARTCHAR, TT);
