@@ -8,6 +8,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab2", "Lab2\Lab2.vcxproj",
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "MeasuringTools", "MeasuringTools\MeasuringTools.pyproj", "{0C065226-A3E1-4CD8-8D47-3AF3BECEC8A7}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab3", "Lab3\Lab3.vcxproj", "{C4FD4F0D-2968-40B9-A901-0107AEE71334}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,12 @@ Global
 		{0C065226-A3E1-4CD8-8D47-3AF3BECEC8A7}.Debug|VisualGDB.ActiveCfg = Debug|Any CPU
 		{0C065226-A3E1-4CD8-8D47-3AF3BECEC8A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C065226-A3E1-4CD8-8D47-3AF3BECEC8A7}.Release|VisualGDB.ActiveCfg = Release|Any CPU
+		{C4FD4F0D-2968-40B9-A901-0107AEE71334}.Debug|Any CPU.ActiveCfg = Debug|VisualGDB
+		{C4FD4F0D-2968-40B9-A901-0107AEE71334}.Debug|VisualGDB.ActiveCfg = Debug|VisualGDB
+		{C4FD4F0D-2968-40B9-A901-0107AEE71334}.Debug|VisualGDB.Build.0 = Debug|VisualGDB
+		{C4FD4F0D-2968-40B9-A901-0107AEE71334}.Release|Any CPU.ActiveCfg = Release|VisualGDB
+		{C4FD4F0D-2968-40B9-A901-0107AEE71334}.Release|VisualGDB.ActiveCfg = Release|VisualGDB
+		{C4FD4F0D-2968-40B9-A901-0107AEE71334}.Release|VisualGDB.Build.0 = Release|VisualGDB
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
