@@ -253,3 +253,6 @@ paket-files/
 
 # VisualGDB
 VisualGDBCache
+
+# Python
+__pycache__

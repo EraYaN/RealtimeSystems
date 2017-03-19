@@ -67,6 +67,25 @@ class TraceFile(object):
 
         return {'t':period,'n':number_of_periods}
 
+    def get_low_period(self, signal, threshold=0):
+        period = 0
+        number_of_periods = 0
+        last_was_low = False
+        last_timestamp = 0
+        last_value = 0
+        if signal not in self.trace:
+            raise ValueError('Signal is not in trace.')
+        for timestamp, value in self.trace[signal].items():
+            if value > threshold and last_was_low:
+                period += (timestamp - last_timestamp)
+                number_of_periods+=1
+            last_was_low = (value <= threshold)
+            last_value = value
+            last_timestamp = timestamp
+
+
+        return {'t':period,'n':number_of_periods}
+
     def find_risingedge_before(self, signal, original_timestamp, threshold=0):
         if signal not in self.trace:
             raise ValueError('Signal is not in trace.')
@@ -82,15 +101,15 @@ class TraceFile(object):
                 first = timestamp
                 first_value = (value > threshold)
             else:
-                if first_value:
-                    if not (value > threshold):
-                        return first
-                else:
+                if not first_value:
                     if (value > threshold):
+                        return timestamp
+                else:
+                    if not (value > threshold):
                         first = timestamp
                         first_value = (value > threshold)
 
-        return first
+        return -1
 
     def find_risingedge_after(self, signal, original_timestamp, threshold=0):
         if signal not in self.trace:
@@ -100,7 +119,7 @@ class TraceFile(object):
         first_value = False
 
         for timestamp, value in self.trace[signal].items():
-            if timestamp <= original_timestamp:
+            if timestamp < original_timestamp:
                 continue
 
             if first == -1:
@@ -109,13 +128,13 @@ class TraceFile(object):
             else:
                 if not first_value:
                     if (value > threshold):
-                        return first
+                        return timestamp
                 else:
                     if not (value > threshold):
                         first = timestamp
                         first_value = (value > threshold)
 
-        return first
+        return -1
 
     def get_event_latency(self, signal_event, signal_intr, signal_threshold=0, intr_threshold=0):
 
@@ -130,6 +149,7 @@ class TraceFile(object):
         exit = False
         while True:
             timestamp = self.find_risingedge_after(signal_event,current_time)
+            print("Found event at {} us".format(timestamp/1000))
             if timestamp > current_time:
                 intr_timestamp = self.find_risingedge_before(signal_intr,timestamp,3)
                 current_time = timestamp
@@ -137,7 +157,7 @@ class TraceFile(object):
                 break
             delay += timestamp - intr_timestamp
             events_found += 1
-            print("Found delay: {} ns".format(delay))
+            print("Found delay: {} ns for event at {} us".format(timestamp - intr_timestamp, timestamp/1000))
 
 
         return {'t':delay,'n':events_found}
