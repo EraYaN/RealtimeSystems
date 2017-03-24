@@ -117,7 +117,7 @@ void HandleTasks(void) {
 	while (HPrioPendingTask >= 0) {
 		int8_t i = HPrioPendingTask;
 		HPrioPendingTask = -1;
-		while (i >= 0 && i > HPrioPendingTask) {
+		while (i > HPrioPendingTask) {
 			Taskp t = &Tasks[i];
 			if (t->Activated != t->Invoked) {
 				if (t->Flags & TRIGGERED) {
