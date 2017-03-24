@@ -115,8 +115,11 @@ uint8_t UnRegisterTask(uint8_t t) {
 
 void HandleTasks(void) {
 	while (HPrioPendingTask >= 0) {
+		uint16_t sw;
+		sw = IntDisable();
 		int8_t i = HPrioPendingTask;
 		HPrioPendingTask = -1;
+		RestoreSW(sw);
 		while (i > HPrioPendingTask) {
 			Taskp t = &Tasks[i];
 			if (t->Activated != t->Invoked) {
