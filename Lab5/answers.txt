@@ -1,0 +1,29 @@
+1.a.i. Does it make sense to have non-pre-emptive DIRECT tasks?
+
+Yes, time is a critical factor for a DIRECT task. With preemption you loose all control over time.
+
+1.a.ii. Does it make sense to disallow non-pre-emptive DIRECT tasks?
+No, most DIRECT tasks can not be preempted. Think about communication with time critical (external) devices, when a quick response is needed by a DIRECT tasks, you cannot stop mid-way responding to do another task first.
+
+1.a.iii. Does it make sense to allow a DIRECT task to be executed when a non-pre-emptive task is interrupted by the interrupt handler?
+
+No, because the first task is non-pre-emptive, so it should never be interrupted. The DIRECT task has to wait (that's just the risk you get with non-pre-emptive tasks, starvation and deadline misses just arround the corner!)
+
+1.b.
+
+2.
+
+3. [diff SchedulerPre.c_old SchedulerPre.c] & [listing HandleTasks()]
+
+4.a.
+
+4.b.
+
+5.a.
+
+5.b.
+
+
+6.
+
+7.
