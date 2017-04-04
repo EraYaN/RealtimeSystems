@@ -12,7 +12,7 @@
  * If an UART has been added:    #define UART
  */
 
-// #define NONPREBASIC 
+// #define NONPREBASIC
 // #define NONPRE
 // #define THREADS
 // #define SEMA
@@ -52,18 +52,45 @@ void CountDelay (volatile uint16_t cnt)
   while (cnt--);
 }
 
+#define q7b
+#ifdef q7b
+// Question 7.b impelemtation
 void BlinkGreen (void)
+{
+    static int i = 0;
+    int j;
+    if (++i % 4 == 0) {
+        for( j = 0 ; j < 6856 ; j++ )
+        {
+            ToggleLeds(GREEN);
+            ToggleLeds(GREEN);
+        }
+        Yield();
+        // CountDelay (60000);
+        for( j = 0 ; j < 6856 ; j++ )
+        {
+            ToggleLeds(GREEN);
+            ToggleLeds(GREEN);
+        }
+        // An event-triggered extension
+        // Activate (REDBLINKPRIO, TicksPS/2);
+    }
+    ToggleLeds(GREEN);
+}
+#else
+void BlinkGreen(void)
 {
   static int i = 0;
   if (++i % 4 == 0) {
     CountDelay (60000); 
 
-    /* An event-triggered extension
-    Activate (REDBLINKPRIO, TicksPS/2);
-    */
-  }    
-  ToggleLeds (GREEN);
+    // An event-triggered extension
+    // Activate (REDBLINKPRIO, TicksPS/2);
+
+  }
+  ToggleLeds(GREEN);
 }
+#endif
 
 
 /* Some Thread-based test routines
@@ -75,7 +102,7 @@ Sem s, t;
 
 void Delay (uint16_t Ticks)
 {
-  Activate (CurrentPrio(), Ticks); Suspend ();
+  Activate(CurrentPrio(), Ticks); Suspend ();
 }
 
 void BlinkerD (void)
@@ -115,7 +142,8 @@ int main(void)
 
 #ifdef Tst1
   RegisterTask (0, 1024, BlinkYellow, YELLOWBLINKPRIO, 0);
-  RegisterTask (0, 512, BlinkGreen, GREENBLINKPRIO, 0);
+  // RegisterTask (0, 512, BlinkGreen, GREENBLINKPRIO, 0);
+  RegisterTask (0, 512, BlinkGreen, GREENBLINKPRIO, FPDS); //question 4.b.
   RegisterTask (0, 0, BlinkRed, REDBLINKPRIO, 0);
 #endif
 #ifdef Tst2

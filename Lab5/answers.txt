@@ -1,8 +1,9 @@
 1.a.i. Does it make sense to have non-pre-emptive DIRECT tasks?
 
-Yes, time is a critical factor for a DIRECT task. With preemption you loose all control over time.
+Yes, time is a critical factor for a DIRECT task. With preemption you would loose all control over time again.
 
 1.a.ii. Does it make sense to disallow non-pre-emptive DIRECT tasks?
+
 No, most DIRECT tasks can not be preempted. Think about communication with time critical (external) devices, when a quick response is needed by a DIRECT tasks, you cannot stop mid-way responding to do another task first.
 
 1.a.iii. Does it make sense to allow a DIRECT task to be executed when a non-pre-emptive task is interrupted by the interrupt handler?
@@ -10,20 +11,54 @@ No, most DIRECT tasks can not be preempted. Think about communication with time 
 No, because the first task is non-pre-emptive, so it should never be interrupted. The DIRECT task has to wait (that's just the risk you get with non-pre-emptive tasks, starvation and deadline misses just arround the corner!)
 
 1.b.
+    In HandleTasks() all the tasks with a higher priority are checked if they need to be invoked first. To be sure that this does not happen when the current task is an non-pre-emptive task, this can be checked by doing something like this at the start of the HandleTasks(). (note: an extra flag is needed for this, which is fine sine Flags is an uint16_t and we currently only have 4 bits in use.)
+
+    Taskp OldTask = CurrentTask();
+    if (!(OldTask->Flags & FPDS)) {
+        [...]
+    }
 
 2.
+Announcements:For Q2, DIRECT tasks should always able to execute when needed. [casper: jammer joh, doen we niet]
+[Scheduler.h]: Flag for non-preemtive tasks
+#define FPDS       128
+
+[SchedulerPre.c:HandleTasks()]: check FPDS flag before interrupting the old task.
+    Taskp OldTask = CurrentTask();
+    if (!(OldTask->Flags & FPDS)) {
+        [...]
+    }
+
+Further more we check all the cases where Taskf() is executed for possible errors:
+[SchedulerPre.c:HandleTasks()]: Already fixed above for FPDS tasks, does not have to handle DIRECT tasks differently.
+
+[SchedulerPre.c:TimerIntrpt()]:
+    if (t->Flags & DIRECT) { t->Invoked++; t->Taskf(); }
+FPDS tasks will not be interrupted here because interrupts are still disabled (we are still in the Interrupt context).
+
+
 
 3. [diff SchedulerPre.c_old SchedulerPre.c] & [listing HandleTasks()]
 
+
+
+Announcements:
+Q4 mentions a Lab 1 version of SchedTest.c, this should be the Lab 4 version, which allows for pre-emption.
 4.a.
 
 4.b.
 
-5.a.
-
-5.b.
 
 
-6.
+5.a. Which measures need to be taken when a non-FPDS task calls Yield()?
+
+HandleTasks() should be executed again, and just like the other calls it is nice to first check if there are any Pending tasks at all.
+    if (Pending) HandleTasks();
+
+5.b. Which measures need to be taken when a DIRECT tasks calls Yield()?
+Since DIRECT calls are time critical, they should just continue despite the Yield() call.
+
+
+6. [listing of Yield()]
 
 7.

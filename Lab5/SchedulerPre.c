@@ -49,7 +49,7 @@
  *     Ticks: delay for activation. Ticks = 0 specifies immediate activation. 
  *   UnRegisterTask (): remove task from registration
  *         t: the task identifier
- *   HandleTasks (): handle all tasks in the range MAXPRIO .. BusyPrio+1
+ *   HandleTasks(): handle all tasks in the range MAXPRIO .. BusyPrio+1
  *   TimerIntrpt (): the timer interrupt routine. It counts down units for all 
  *                   TT marked tasks.
  *                   Whenever the count for a task reaches 0 the task get triggered.
@@ -61,9 +61,9 @@ Task Tasks[NUMTASKS];           /* Lower indices: lower priorities           */
 volatile int8_t BusyPrio;       /* Current priority being served             */
 uint8_t Pending = 0;            /* Indicates if there is a pending task      */ 
 
-void HandleTasks (void);
+void HandleTasks(void);
 
-uint16_t IntDisable (void)
+uint16_t IntDisable(void)
 {
   uint16_t sw;
     // sw = r2
@@ -72,9 +72,9 @@ uint16_t IntDisable (void)
   return (sw);
 }
 
-void RestoreSW (uint16_t sw)
+void RestoreSW(uint16_t sw)
 {
-  if (Pending && (sw & INTRPT_BIT)) HandleTasks ();
+  if (Pending && (sw & INTRPT_BIT)) HandleTasks();
     // r2 = sw
   asm volatile ("mov.w %0, r2\n\t" :: "r"(sw));
 }  
@@ -91,7 +91,7 @@ Taskp Prio2Taskp (uint8_t Prio)
  * The clock must be started elsewhere.
  */
 
-void InitTasks (void)
+void InitTasks(void)
 {			
   uint8_t i=NUMTASKS-1; 
   do { 
@@ -107,14 +107,14 @@ void InitTasks (void)
  * Each priority level has at most one task.
  */
 
-uint8_t RegisterTask (uint16_t Phasing, uint16_t Period, 
-                      void (*TaskFunc) (void), uint8_t Prio, uint8_t Flags)
+uint8_t RegisterTask(uint16_t Phasing, uint16_t Period, 
+                     void (*TaskFunc) (void), uint8_t Prio, uint8_t Flags)
 {
   uint8_t  rtc = E_SUCCESS;
   uint16_t sw;
 
   if (Prio>=NUMTASKS) return (E_BOUNDS); // out of bounds
-  sw = IntDisable (); 
+  sw = IntDisable(); 
   Taskp t = &Tasks[Prio]; 
   if (t->Flags) rtc = E_BUSY; 
   else {
@@ -126,7 +126,7 @@ uint8_t RegisterTask (uint16_t Phasing, uint16_t Period,
     if (Phasing>0 || Period>0) Flags |= TT;
     t->Flags = Flags | TRIGGERED;
   }
-  RestoreSW (sw);
+  RestoreSW(sw);
   return (rtc);
 }
 
@@ -137,7 +137,7 @@ uint8_t RegisterTask (uint16_t Phasing, uint16_t Period,
  *       task is active or not.
  */
 
-uint8_t UnRegisterTask (uint8_t t)
+uint8_t UnRegisterTask(uint8_t t)
 {
   if (t>=NUMTASKS) return (E_BOUNDS); // out of bounds
   Tasks[t].Flags = 0;
@@ -149,10 +149,21 @@ uint8_t UnRegisterTask (uint8_t t)
  *   Activate (t, d): activate task t after d time units
  */
 
-void HandleTasks (void)
+// This operation allows all pending jobs of tasks with 
+// a priority higher than the currently executing task to preempt.
+// Once all that pending (+new arrived) work has been completed,
+// the pre-empted task is allowed to continue its execution non-pre-emptively.
+void Yield(void){
+  Taskp OldTask = CurrentTask();
+  // HandleTasks() if any Pending, and currently not doing a DIRECT or FPDS task
+  if (Pending && !(OldTask->Flags & (DIRECT | FPDS))) HandleTasks();
+}
+
+void HandleTasks(void)
 { 
   int8_t oldBP = BusyPrio; // Save BusyPrio = current task handling level
-
+  Taskp OldTask = CurrentTask();
+  if (!(OldTask->Flags & FPDS)) { //First check if it is allowed to preempt the current task
   Pending = 0;             // This instance will handle all new
                            // pending tasks.
   BusyPrio = NUMTASKS-1;   // Start at highest priority
@@ -167,8 +178,9 @@ void HandleTasks (void)
     }
     BusyPrio--;
 } }
+}
 
-interrupt (TIMERA0_VECTOR) TimerIntrpt (void)
+interrupt (TIMERA0_VECTOR) TimerIntrpt(void)
 {
   uint8_t i = NUMTASKS-1; 
   do {
@@ -182,7 +194,7 @@ interrupt (TIMERA0_VECTOR) TimerIntrpt (void)
   	else Pending |= i>BusyPrio;
       }
   } while (i--);
-  if (Pending) HandleTasks (); /* stay in interrupt context *
+  if (Pending) HandleTasks(); /* stay in interrupt context *
                                 * interrupts disabled       */
 }
 
