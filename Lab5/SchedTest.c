@@ -54,7 +54,7 @@ void CountDelay (volatile uint16_t cnt)
 
 #define q7b
 #ifdef q7b
-// Question 7.b impelemtation
+// Question 7.b implementation
 void BlinkGreen (void)
 {
     static int i = 0;
