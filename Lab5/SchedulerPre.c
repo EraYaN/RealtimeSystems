@@ -154,9 +154,14 @@ uint8_t UnRegisterTask(uint8_t t)
 // Once all that pending (+new arrived) work has been completed,
 // the pre-empted task is allowed to continue its execution non-pre-emptively.
 void Yield(void){
+  uint16_t sw;
+  sw = IntDisable();
   Taskp OldTask = CurrentTask();
   // HandleTasks() if any Pending, and currently not doing a DIRECT or FPDS task
-  if (Pending && !(OldTask->Flags & (DIRECT | FPDS))) HandleTasks();
+  if (Pending && !(OldTask->Flags & (DIRECT | FPDS))){
+    RestoreSW(sw);
+    HandleTasks();
+  }
 }
 
 void HandleTasks(void)
